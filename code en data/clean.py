@@ -1,7 +1,7 @@
 
 # Door: Reinout Mensing
 # 
-# Bevat.....
+# Script takes a dirty csv and puts out a clean csv
 # 
 # ----------------------------------------------------------------------------------------
 
@@ -186,6 +186,56 @@ def process_room_estimates(df):
 
     return df
 
+def bin_programmes(df):
+    '''
+    Classifies all program names and changes them in the df
+    '''
+  
+    for index, row in df.iterrows():
+    
+        program = df.at[index, 'What programme are you in?']
+
+        if 'AI' in program or 'ntelligence' in program:
+            df.at[index, 'What programme are you in?'] = "Artificial Intelligence"
+        
+        elif 'conometrics' in program: 
+            df.at[index, 'What programme are you in?'] = 'Econometrics'
+        
+        elif 'omputational' in program or 'CLS' in program:
+            df.at[index, 'What programme are you in?'] = "Computational Science"
+        
+        elif 'antitative' in program or 'QRM' in program: 
+            df.at[index, 'What programme are you in?'] = "Quantitative Risk Management"
+        
+        elif 'nalytics' in program or 'BA' in program:
+            df.at[index, 'What programme are you in?'] = "Business Analytics"
+
+        elif 'omputer' in program or 'CS' in program:
+            df.at[index, 'What programme are you in?'] = "Computer Science"
+
+        elif 'fin' in program: 
+            df.at[index, 'What programme are you in?'] = "Finance and Technology"
+        
+        elif 'io' in program: 
+            df.at[index, 'What programme are you in?'] = "Bioinformatics"
+        
+        elif 'ex' in program:
+            df.at[index, 'What programme are you in?'] = "Exhange Programme"
+        
+        elif 'euro' in program: 
+            df.at[index, 'What programme are you in?'] = "Neuroscience"
+        
+        elif 'phd' in program or 'PhD' in program: 
+            df.at[index, 'What programme are you in?'] = "PhD"
+        
+        elif 'life' in program:
+            df.at[index, 'What programme are you in?'] = "Life Sciences"
+        
+        else: 
+            df.at[index, 'What programme are you in?'] = "Other"
+
+    return df
+
 
 def clean_frame(path):
     df = read(path)
@@ -193,6 +243,7 @@ def clean_frame(path):
     df = process_room_estimates(df)
     df = process_sports(df)
     df = process_bed_times(df)
+    df = bin_programmes(df)
 
     df.to_csv('clean.csv', index=False)
     # Calculate Z-scores and replace outliers (using the median-based approach)
@@ -205,6 +256,3 @@ def clean_frame(path):
 
     return df
 
-
-# d = clean(df)
-# print(d)
