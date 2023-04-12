@@ -1,3 +1,5 @@
+# --------------------------------------------------------------------------------------------------------
+# main.py
 # Data Mining Techniques
 # Reinout Mensing, Margot Boekema, Koen Smallegange 
 # april 2023

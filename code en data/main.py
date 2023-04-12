@@ -7,9 +7,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from functions import bin_programmes
-import sys
+from clean import clean_frame
 
-df = pd.read_csv("data.csv", delimiter = ";", error_bad_lines='false')
+# define path to data
+path = 'data.csv'
+
+# get a clean dataframe
+df = clean_frame(path)
+
+# rename the headers
 df.rename(
     columns=({ 'Tijdstempel': 'time', 'What is your gender?': 'gender', 'What programme are you in?': 'programme',
                'Have you taken a course on machine learning?': 'ML course',
@@ -24,25 +30,8 @@ df.rename(
     inplace=True,
 )
 
-dfc = bin_programmes(df)
-prol = []
+# classify the study programmes
+df = bin_programmes(df)
 
-for index, row in dfc.iterrows():
-    cpgt = dfc.at[index, 'used chatGPT']
-    
-    if 'yes' in cpgt:
-        program = dfc.at[index, 'programme']
-        print(cpgt, program, index)
-        prol.append(program)
-
-
-print(prol)
-
-
-
-
-
-
-
-
-
+# print dataframe
+print(df)

@@ -1,3 +1,10 @@
+
+# Door: Reinout Mensing
+# 
+# Bevat.....
+# 
+# ----------------------------------------------------------------------------------------
+
 import pandas as pd
 import numpy as np
 from scipy.stats import zscore
@@ -57,26 +64,30 @@ def multiple_imputation(df, max_iter=10):
 
     return imputed_df
 
-# Read the dataset
-df = pd.read_csv('data.csv', sep=';')
+def read(path):
+    # Read the dataset
+    df = pd.read_csv(path, sep=';')
 
-# Remove leading and trailing whitespace from column names
-df.columns = df.columns.str.strip()
+    # Remove leading and trailing whitespace from column names
+    df.columns = df.columns.str.strip()
 
-# Convert 'yes', 'no', 'unknown' to 1, 0, and np.nan
-yes_no_mapping = {'yes': 1, 'no': 0}
-male_female_mapping = {'male': 1, 'female':0}
-information_retrieval = {'1': 1, '0':0}
-database_retrieval = {'ja': 1, 'nee': 0}
-df['Have you taken a course on machine learning?'] = df['Have you taken a course on machine learning?'].map(yes_no_mapping)
-df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].replace(information_retrieval)
-df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].where(df['Have you taken a course on information retrieval?'].isin([0, 1]), None)
-df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map(lambda x: 1 if x == 'mu' else 0)
-df['Have you taken a course on databases?'] = df['Have you taken a course on databases?'].map(database_retrieval)
-df['When is your birthday (date)?'] = pd.to_datetime(df['When is your birthday (date)?'], errors='coerce')
-df['Did you stand up to come to your previous answer    ?'] = df['Did you stand up to come to your previous answer    ?'].map(yes_no_mapping)
-df['I have used ChatGPT to help me with some of my study assignments'] = df['I have used ChatGPT to help me with some of my study assignments'].map(yes_no_mapping)
-df['What is your gender?'] = df['What is your gender?'].map(male_female_mapping)
+    # Convert 'yes', 'no', 'unknown' to 1, 0, and np.nan
+    yes_no_mapping = {'yes': 1, 'no': 0}
+    male_female_mapping = {'male': 1, 'female':0}
+    information_retrieval = {'1': 1, '0':0}
+    database_retrieval = {'ja': 1, 'nee': 0}
+    df['Have you taken a course on machine learning?'] = df['Have you taken a course on machine learning?'].map(yes_no_mapping)
+    df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].replace(information_retrieval)
+    df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].where(df['Have you taken a course on information retrieval?'].isin([0, 1]), None)
+    df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map(lambda x: 1 if x == 'mu' else 0)
+    df['Have you taken a course on databases?'] = df['Have you taken a course on databases?'].map(database_retrieval)
+    df['When is your birthday (date)?'] = pd.to_datetime(df['When is your birthday (date)?'], errors='coerce')
+    df['Did you stand up to come to your previous answer    ?'] = df['Did you stand up to come to your previous answer    ?'].map(yes_no_mapping)
+    df['I have used ChatGPT to help me with some of my study assignments'] = df['I have used ChatGPT to help me with some of my study assignments'].map(yes_no_mapping)
+    df['What is your gender?'] = df['What is your gender?'].map(male_female_mapping)
+
+    return df
+
 def process_time_bed():
     pass
 
@@ -175,18 +186,25 @@ def process_room_estimates(df):
 
     return df
 
-df = process_stress_levels(df)
-df = process_room_estimates(df)
-df = process_sports(df)
-df = process_bed_times(df)
 
-df.to_csv('clean.csv', index=False)
-# Calculate Z-scores and replace outliers (using the median-based approach)
-zscores_df = df.select_dtypes(include=['number']).apply(zscore)
-z_threshold = 3
-for column in zscores_df.columns:
-    non_outliers = df.loc[(zscores_df[column].abs() <= z_threshold), column]
-    median = non_outliers.median()
-    df[column] = df[column].where(zscores_df[column].abs() <= z_threshold, median)
+def clean_frame(path):
+    df = read(path)
+    df = process_stress_levels(df)
+    df = process_room_estimates(df)
+    df = process_sports(df)
+    df = process_bed_times(df)
 
-print(df)
+    df.to_csv('clean.csv', index=False)
+    # Calculate Z-scores and replace outliers (using the median-based approach)
+    zscores_df = df.select_dtypes(include=['number']).apply(zscore)
+    z_threshold = 3
+    for column in zscores_df.columns:
+        non_outliers = df.loc[(zscores_df[column].abs() <= z_threshold), column]
+        median = non_outliers.median()
+        df[column] = df[column].where(zscores_df[column].abs() <= z_threshold, median)
+
+    return df
+
+
+# d = clean(df)
+# print(d)

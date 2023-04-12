@@ -1,4 +1,12 @@
 
+# Data Mining Techniques
+# april 2023
+# 
+# bevat helper functions voor main.py
+# 
+# ---------------------------------------------------------------------------------------------------------
+
+
 def bin_programmes(df):
     '''
     Classifies all program names and changes them in the df
