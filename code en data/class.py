@@ -145,7 +145,6 @@ def gain_ratio_DT():
 
 stress_level = decision_tree_algorithm()
 
-
 # # Iterate through the column
                 # for i in df[col]:
                     
@@ -158,3 +157,4 @@ stress_level = decision_tree_algorithm()
 
                 # for key, count in string_counts.items():
                 #     print(f"{key}: {count}")
+
