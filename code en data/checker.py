@@ -12,9 +12,10 @@ import sys
 
 # ... (keep your existing functions here) ...
 
-def build_decision_tree(df, remaining_columns, depth=0, max_depth=3):
+def build_decision_tree(df, remaining_columns, depth=0, max_depth=17):
     # Base case: If there are no remaining columns or the DataFrame is empty, return
     # get rid of this last bit of code. Its only for visibility.
+
     if not remaining_columns or df.empty or depth == max_depth:
         return
 
@@ -23,13 +24,18 @@ def build_decision_tree(df, remaining_columns, depth=0, max_depth=3):
 
     # Remove the selected column from the remaining columns
     remaining_columns = [col for col in remaining_columns if col != attribute]
+    
 
     # Initialize the decision tree node
     node = {'attribute': attribute, 'children': {}}
+    
 
     # Split the DataFrame based on the selected column's unique values
+    # hier gebeurt iets raars
+    print('att')
+    print(df[attribute])
     unique_values = df[attribute].unique()
-
+    
     for value in unique_values:
         # Apply the split on the selected column
         split_df = df[df[attribute] == value].copy()
@@ -46,37 +52,45 @@ def build_decision_tree(df, remaining_columns, depth=0, max_depth=3):
 def find_lowest_entropy(df, remaining_columns):
     lowest_entropy = float("inf")
     selected_attribute = None
-    print('remaining')
-    print(remaining_columns)
+   
     for col in remaining_columns:
-        print(col)
+        
         if col in [df.columns[2], df.columns[3], df.columns[4], df.columns[5], df.columns[6], df.columns[7], df.columns[10]]:
             value_list = [0, 1]
+
         elif col == df.columns[1]:
             value_list = ['AI', 'Econometrics', 'Computational Science', 'Quantitative Risk Management', 'Business Analytics', 'Computer Science', 'Finance and Technology', 'Bioinformatics', 'Exhange Programme', 'Neuroscience', 'PhD', 'Life Sciences', 'Other']
+
         elif col == df.columns[9]:
             value_list = ['0-50', '51-100', '101-200', '201-300', '301-400', '401-500', '501-1000', '1001+']
+
         elif col == df.columns[12]:
             value_list = ['0', '0-2', '2-4', '4-6', '6-10', '10-15', '15+']
+
         else:
             continue
         
-        print(col)
+    
 
         col_dict = attributes(col, df, value_list)
         weighted_entropy = entropy(col_dict)
-        if weighted_entropy <= lowest_entropy:
+        print(weighted_entropy)
+        print(lowest_entropy)
+        print(col)
+        if weighted_entropy < lowest_entropy:
             lowest_entropy = weighted_entropy
             selected_attribute = col
     print('selected')
     print(selected_attribute)
+
     return selected_attribute, lowest_entropy
 
 # Main function to call
 def decision_tree_algorithm(df):
+    
     remaining_columns = list(df.columns)
     remaining_columns.remove("What is your stress level (0-100)?")  # Assuming this is the target variable
-    remaining_columns.remove(df.columns[0])
+    remaining_columns.remove(df.columns[0])   
     remaining_columns.remove(df.columns[8])   # Assuming this is the irrelevant "Birthday" column
     remaining_columns.remove(df.columns[13])  # Removing empty columns
     remaining_columns.remove(df.columns[14])
@@ -113,55 +127,53 @@ def stress_level_evaluator(value,col,df,number_of_values):
     # need to first create 10 different totals of the stress 
     stress_levels = np.zeros((1,10))
     row_numbers = df[df[col] == value].index.tolist()
-    print(value)
-    print('row')
-    print(row_numbers)
     stress = 'What is your stress level (0-100)?'
     total = 0
     for row_number in row_numbers:
-        value = df.loc[row_number, stress]
-        print('ja')
-        # Placeholder code
-        try:
-            value = int(value)
-        except ValueError:
-            value = 1
+        stress_value = df.loc[row_number, stress]
+       
 
         total = total + 1
-        if value >= 0 and value < 10:
+        
+        
+        if stress_value == '0-10':
             stress_levels[0,0] = stress_levels[0,0] + 1
-        if value >= 10 and value < 20:
+        if stress_value == '10-20':
             stress_levels[0,1] = stress_levels[0,1] + 1
-        if value >= 20 and value < 30:
+        if stress_value == '20-30':
             stress_levels[0,2] = stress_levels[0,2] + 1
-        if value >= 30 and value < 40:
+        if stress_value == '30-40':
             stress_levels[0,3] = stress_levels[0,3] + 1
-        if value >= 40 and value < 50:
+        if stress_value == '40-50':
             stress_levels[0,4] = stress_levels[0,4] + 1
-        if value >= 50 and value < 60:
+        if stress_value == '50-60':
             stress_levels[0,5] = stress_levels[0,5] + 1
-        if value >= 60 and value < 70:
+        if stress_value == '60-70':
             stress_levels[0,6] = stress_levels[0,6] + 1
-        if value >= 70 and value < 80:
+        if stress_value == '70-80':
             stress_levels[0,7] = stress_levels[0,7] + 1
-        if value >= 80 and value < 90:
+        if stress_value == '80-90':
             stress_levels[0,8] = stress_levels[0,8] + 1
-        if value >= 90:
+        if stress_value == '90-100':
             stress_levels[0,9] = stress_levels[0,9] + 1
 
     stress_level = stress_levels[0]
-
+    
     # Laplace replacement and probability calculation.
     number_of_zeros = np.count_nonzero(stress_level == 0)
     i = 0
     # HIER NIET ZEKER OF DE LEGE LIJSTEN OOK ALLEMAAL VALUES MOETEN KRIJGEN
     # EN OOK NIET OF DE NIET-NUL VALUES OOK EEN EXTRA WAARDE MOETEN KRIJGEN MAAR NEEM AAN VAN WEL
     # VRAAG DIT AAN TA.
+
     for item in stress_level:
-        chance_per_stress_level = (item + number_of_zeros)/(total + number_of_zeros * 10)
+        if number_of_zeros >= 1:
+            chance_per_stress_level = (item + 1)/(total + 10)
+        else : 
+            chance_per_stress_level = item/total 
         stress_level[i] = chance_per_stress_level
         i = i + 1
-        
+    
     return stress_level
 
 def weighted_average(list_for_weight,entropydict):
@@ -181,8 +193,10 @@ def entropy(dictionary):
     entropydict = {}
     list_for_weight = []
     i = 0
+    
 
     for values in dictionary.values():
+        
     
         entropyscore = 0
         
@@ -192,8 +206,9 @@ def entropy(dictionary):
         list_for_weight.append(sum(values))
         entropydict[list(dictionary.keys())[i]] = entropyscore
         i = i + 1
+    
     weighted_entropy = weighted_average(list_for_weight,entropydict)
-
+    
     return weighted_entropy
 
 
@@ -232,10 +247,12 @@ def add_nodes_edges(tree, graph, parent=None):
             graph.add_node(leaf_node)
             graph.add_edge(attribute, leaf_node)
 
-df = pd.read_csv('data.csv', sep=';')
+df = pd.read_csv('clean.csv', sep=',')
 train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
-
+test_df.to_csv('testset.csv',index = False)
+train_df.to_csv('trainset.csv', index=False)
 tree = decision_tree_algorithm(train_df)
+
 
 # Make predictions on the test set
 predictions = []
@@ -246,10 +263,13 @@ for _, row in test_df.iterrows():
 print(predictions)
 
 # Test decision tree algorithm
-tree = decision_tree_algorithm()
+
+
+
+
 # graph = plot_decision_tree(tree)
 # graph.view()
-print(tree)
+
 
 
 # plot using graphviz
