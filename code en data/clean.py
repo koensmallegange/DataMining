@@ -64,6 +64,12 @@ def multiple_imputation(df, max_iter=10):
 
     return imputed_df
 
+
+
+
+
+
+
 def read(path):
     # Read the dataset
     df = pd.read_csv(path, sep=';')
@@ -79,7 +85,9 @@ def read(path):
     df['Have you taken a course on machine learning?'] = df['Have you taken a course on machine learning?'].map(yes_no_mapping)
     df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].replace(information_retrieval)
     df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].where(df['Have you taken a course on information retrieval?'].isin([0, 1]), None)
-    df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map(lambda x: 1 if x == 'mu' else 0)
+    df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].astype(str)
+    df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map({'mu': 1, 'sigma':0})
+    # df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map(lambda x: 1 if x == 'mu' else 0)
     df['Have you taken a course on databases?'] = df['Have you taken a course on databases?'].map(database_retrieval)
     df['When is your birthday (date)?'] = pd.to_datetime(df['When is your birthday (date)?'], errors='coerce')
     df['Did you stand up to come to your previous answer    ?'] = df['Did you stand up to come to your previous answer    ?'].map(yes_no_mapping)
@@ -100,7 +108,7 @@ def process_stress_levels(df):
         df['What is your stress level (0-100)?'], errors='coerce')
     
     # Assign the bins
-    df['What is your stress level (0-100)?'] = pd.cut(df['What is your stress level (0-100)?'], bins=bins, labels=labels)
+    # df['What is your stress level (0-100)?'] = pd.cut(df['What is your stress level (0-100)?'], bins=bins, labels=labels)
     
     # Remove rows with NaN values in the 'Stress Level Range' column
     df = df.dropna(subset=['What is your stress level (0-100)?'])
@@ -163,8 +171,14 @@ def process_sports(df):
     df['How many hours per week do you do sports (in whole hours)?'] = pd.to_numeric(
         df['How many hours per week do you do sports (in whole hours)?'], errors='coerce')
         # Replace the values with the corresponding range
-    df['How many hours per week do you do sports (in whole hours)?'] = pd.cut(
-        df['How many hours per week do you do sports (in whole hours)?'], bins=bins, labels=labels)
+
+
+    df.loc[df['How many hours per week do you do sports (in whole hours)?'] < 0, 'How many hours per week do you do sports (in whole hours)?'] = np.nan
+
+
+    df = df.dropna(subset=['How many hours per week do you do sports (in whole hours)?'])   
+    # df['How many hours per week do you do sports (in whole hours)?'] = pd.cut(
+    #     df['How many hours per week do you do sports (in whole hours)?'], bins=bins, labels=labels)
     return df
 
 
@@ -180,9 +194,9 @@ def process_room_estimates(df):
     bins = [-1, 50, 100, 200, 300, 400, 500, 1000, float('inf')]
     labels = ['0-50', '51-100', '101-200', '201-300', '301-400', '401-500', '501-1000', '1001+']
 
-    # Replace the values with the corresponding range
-    df['How many students do you estimate there are in the room?'] = pd.cut(
-        df['How many students do you estimate there are in the room?'], bins=bins, labels=labels)
+    # # Replace the values with the corresponding range
+    # df['How many students do you estimate there are in the room?'] = pd.cut(
+    #     df['How many students do you estimate there are in the room?'], bins=bins, labels=labels)
 
     return df
 
@@ -247,12 +261,12 @@ def clean_frame(path):
 
     df.to_csv('clean.csv', index=False)
     # Calculate Z-scores and replace outliers (using the median-based approach)
-    zscores_df = df.select_dtypes(include=['number']).apply(zscore)
-    z_threshold = 3
-    for column in zscores_df.columns:
-        non_outliers = df.loc[(zscores_df[column].abs() <= z_threshold), column]
-        median = non_outliers.median()
-        df[column] = df[column].where(zscores_df[column].abs() <= z_threshold, median)
+    # zscores_df = df.select_dtypes(include=['number']).apply(zscore)
+    # z_threshold = 3
+    # for column in zscores_df.columns:
+    #     non_outliers = df.loc[(zscores_df[column].abs() <= z_threshold), column]
+    #     median = non_outliers.median()
+    #     df[column] = df[column].where(zscores_df[column].abs() <= z_threshold, median)
 
     return df
 
