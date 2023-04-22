@@ -17,7 +17,7 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 import sys
 import numpy as np
-
+from bin import bin
 # ---------------------------------------------------------------------------------------------------------
 # set paramters
 # ---------------------------------------------------------------------------------------------------------
@@ -237,6 +237,16 @@ def plot_imputaiton_results(df, z, iterations):
     plt.show()
 
 
+    if time_str is None:
+        return None
+    hours, minutes = map(int, time_str.split(':'))
+    
+    if 0 <= minutes < 30:
+        minutes_range = "00-29"
+    else:
+        minutes_range = "30-59"
+    
+    return f"{hours:02d}:{minutes_range}"
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -269,11 +279,15 @@ columns = list(columns)
 dfc = pd.merge(df, df_imp, on=columns, how = 'inner')
 
 
-# save the file
+# binn some coloumns for the decions tree
+dfc = bin(dfc)
+
+
+# save csv
 dfc.to_csv('imputed.csv', index=False)
 
 
-
+print(dfc)
 
 
 
