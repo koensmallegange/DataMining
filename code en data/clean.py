@@ -84,7 +84,8 @@ def read(path):
     database_retrieval = {'ja': 1, 'nee': 0}
     df['Have you taken a course on machine learning?'] = df['Have you taken a course on machine learning?'].map(yes_no_mapping)
     df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].replace(information_retrieval)
-    df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].where(df['Have you taken a course on information retrieval?'].isin([0, 1]), None)
+    df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].where(df['Have you taken a course on information retrieval?'].isin([0, 1]), np.nan)
+    df['Have you taken a course on information retrieval?'] = df['Have you taken a course on information retrieval?'].astype('float64')
     df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].astype(str)
     df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map({'mu': 1, 'sigma':0})
     # df['Have you taken a course on statistics?'] = df['Have you taken a course on statistics?'].map(lambda x: 1 if x == 'mu' else 0)
